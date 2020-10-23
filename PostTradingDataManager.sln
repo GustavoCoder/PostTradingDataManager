@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30320.27
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PostTradingDataManager", "PostTradingDataManager\PostTradingDataManager.csproj", "{09A0457B-FD7D-4282-8BC6-FBB51594EBBA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5D9C15B9-842E-4D56-9811-7E9B3A72CBB3}"
+	ProjectSection(SolutionItems) = preProject
+		README.txt = README.txt
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{09A0457B-FD7D-4282-8BC6-FBB51594EBBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09A0457B-FD7D-4282-8BC6-FBB51594EBBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09A0457B-FD7D-4282-8BC6-FBB51594EBBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09A0457B-FD7D-4282-8BC6-FBB51594EBBA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6544BE2A-1C94-4712-8ED3-79B8566A87E5}
+	EndGlobalSection
+EndGlobal
