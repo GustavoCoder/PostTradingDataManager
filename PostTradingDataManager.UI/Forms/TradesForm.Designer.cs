@@ -29,12 +29,12 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle13 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle14 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle15 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle16 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle17 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle18 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.pnlTradesMenu = new System.Windows.Forms.Panel();
             this.gbGroupBy = new System.Windows.Forms.GroupBox();
             this.rbGroupByAccount = new System.Windows.Forms.RadioButton();
@@ -46,7 +46,7 @@
             this.btnExportExcel = new System.Windows.Forms.Button();
             this.btnExportCsv = new System.Windows.Forms.Button();
             this.btnExportPdf = new System.Windows.Forms.Button();
-            this.btnSearch = new System.Windows.Forms.Button();
+            this.btnLoadTrades = new System.Windows.Forms.Button();
             this.pnlGrid = new System.Windows.Forms.Panel();
             this.dgvTrades = new System.Windows.Forms.DataGridView();
             this.tradeIdDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -73,7 +73,7 @@
             this.pnlTradesMenu.Controls.Add(this.btnExportExcel);
             this.pnlTradesMenu.Controls.Add(this.btnExportCsv);
             this.pnlTradesMenu.Controls.Add(this.btnExportPdf);
-            this.pnlTradesMenu.Controls.Add(this.btnSearch);
+            this.pnlTradesMenu.Controls.Add(this.btnLoadTrades);
             this.pnlTradesMenu.Dock = System.Windows.Forms.DockStyle.Right;
             this.pnlTradesMenu.Location = new System.Drawing.Point(650, 0);
             this.pnlTradesMenu.Name = "pnlTradesMenu";
@@ -160,8 +160,8 @@
             this.btnGroupSearch.Size = new System.Drawing.Size(150, 45);
             this.btnGroupSearch.TabIndex = 5;
             this.btnGroupSearch.Text = "Group Search";
-            this.btnGroupSearch.UseVisualStyleBackColor = true;
-            this.btnGroupSearch.Click += new System.EventHandler(this.btnAverages_Click);
+            this.btnGroupSearch.UseVisualStyleBackColor = false;
+            this.btnGroupSearch.Click += new System.EventHandler(this.btnGroupTrades_Click);
             // 
             // lblRowCount
             // 
@@ -225,22 +225,22 @@
             this.btnExportPdf.UseVisualStyleBackColor = true;
             this.btnExportPdf.Click += new System.EventHandler(this.btnExportPdf_Click);
             // 
-            // btnSearch
+            // btnLoadTrades
             // 
-            this.btnSearch.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnSearch.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSearch.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSearch.Image = global::PostTradingDataManager.UI.Properties.Resources.procurar;
-            this.btnSearch.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnSearch.Location = new System.Drawing.Point(0, 0);
-            this.btnSearch.Margin = new System.Windows.Forms.Padding(5);
-            this.btnSearch.Name = "btnSearch";
-            this.btnSearch.Padding = new System.Windows.Forms.Padding(5);
-            this.btnSearch.Size = new System.Drawing.Size(150, 45);
-            this.btnSearch.TabIndex = 0;
-            this.btnSearch.Text = "Search";
-            this.btnSearch.UseVisualStyleBackColor = true;
-            this.btnSearch.Click += new System.EventHandler(this.btnSearch_Click);
+            this.btnLoadTrades.Dock = System.Windows.Forms.DockStyle.Top;
+            this.btnLoadTrades.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnLoadTrades.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnLoadTrades.Image = global::PostTradingDataManager.UI.Properties.Resources.procurar;
+            this.btnLoadTrades.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnLoadTrades.Location = new System.Drawing.Point(0, 0);
+            this.btnLoadTrades.Margin = new System.Windows.Forms.Padding(5);
+            this.btnLoadTrades.Name = "btnLoadTrades";
+            this.btnLoadTrades.Padding = new System.Windows.Forms.Padding(5);
+            this.btnLoadTrades.Size = new System.Drawing.Size(150, 45);
+            this.btnLoadTrades.TabIndex = 0;
+            this.btnLoadTrades.Text = "Load All";
+            this.btnLoadTrades.UseVisualStyleBackColor = true;
+            this.btnLoadTrades.Click += new System.EventHandler(this.btnSearch_Click);
             // 
             // pnlGrid
             // 
@@ -288,9 +288,9 @@
             // 
             this.tradeDateDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.tradeDateDataGridViewTextBoxColumn.DataPropertyName = "TradeDate";
-            dataGridViewCellStyle13.Format = "d";
-            dataGridViewCellStyle13.NullValue = null;
-            this.tradeDateDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle13;
+            dataGridViewCellStyle1.Format = "d";
+            dataGridViewCellStyle1.NullValue = null;
+            this.tradeDateDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle1;
             this.tradeDateDataGridViewTextBoxColumn.HeaderText = "Date";
             this.tradeDateDataGridViewTextBoxColumn.Name = "tradeDateDataGridViewTextBoxColumn";
             this.tradeDateDataGridViewTextBoxColumn.ReadOnly = true;
@@ -299,8 +299,8 @@
             // 
             this.accountDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.accountDataGridViewTextBoxColumn.DataPropertyName = "Account";
-            dataGridViewCellStyle14.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.accountDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle14;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.accountDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle2;
             this.accountDataGridViewTextBoxColumn.FillWeight = 60F;
             this.accountDataGridViewTextBoxColumn.HeaderText = "Account";
             this.accountDataGridViewTextBoxColumn.Name = "accountDataGridViewTextBoxColumn";
@@ -310,8 +310,8 @@
             // 
             this.tickerDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.tickerDataGridViewTextBoxColumn.DataPropertyName = "Ticker";
-            dataGridViewCellStyle15.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.tickerDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle15;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.tickerDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle3;
             this.tickerDataGridViewTextBoxColumn.FillWeight = 60F;
             this.tickerDataGridViewTextBoxColumn.HeaderText = "Ticker";
             this.tickerDataGridViewTextBoxColumn.Name = "tickerDataGridViewTextBoxColumn";
@@ -321,8 +321,8 @@
             // 
             this.sideDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.sideDataGridViewTextBoxColumn.DataPropertyName = "Side";
-            dataGridViewCellStyle16.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.sideDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle16;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.sideDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle4;
             this.sideDataGridViewTextBoxColumn.FillWeight = 40F;
             this.sideDataGridViewTextBoxColumn.HeaderText = "Side";
             this.sideDataGridViewTextBoxColumn.Name = "sideDataGridViewTextBoxColumn";
@@ -332,10 +332,10 @@
             // 
             this.quantityDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.quantityDataGridViewTextBoxColumn.DataPropertyName = "Quantity";
-            dataGridViewCellStyle17.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle17.Format = "N0";
-            dataGridViewCellStyle17.NullValue = null;
-            this.quantityDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle17;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle5.Format = "N0";
+            dataGridViewCellStyle5.NullValue = null;
+            this.quantityDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle5;
             this.quantityDataGridViewTextBoxColumn.FillWeight = 60F;
             this.quantityDataGridViewTextBoxColumn.HeaderText = "Quantity";
             this.quantityDataGridViewTextBoxColumn.Name = "quantityDataGridViewTextBoxColumn";
@@ -345,10 +345,10 @@
             // 
             this.priceDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.priceDataGridViewTextBoxColumn.DataPropertyName = "Price";
-            dataGridViewCellStyle18.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle18.Format = "N4";
-            dataGridViewCellStyle18.NullValue = null;
-            this.priceDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle18;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle6.Format = "N4";
+            dataGridViewCellStyle6.NullValue = null;
+            this.priceDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle6;
             this.priceDataGridViewTextBoxColumn.FillWeight = 60F;
             this.priceDataGridViewTextBoxColumn.HeaderText = "Price";
             this.priceDataGridViewTextBoxColumn.Name = "priceDataGridViewTextBoxColumn";
@@ -356,7 +356,7 @@
             // 
             // tradeDtoBindingSource
             // 
-            this.tradeDtoBindingSource.DataSource = typeof(PostTradingDataManager.UI.TradeDto);
+            this.tradeDtoBindingSource.DataSource = typeof(PostTradingDataManager.UI.TradesDto);
             // 
             // TradesForm
             // 
@@ -384,7 +384,7 @@
         private System.Windows.Forms.Button btnExportExcel;
         private System.Windows.Forms.Button btnExportCsv;
         private System.Windows.Forms.Button btnExportPdf;
-        private System.Windows.Forms.Button btnSearch;
+        private System.Windows.Forms.Button btnLoadTrades;
         private System.Windows.Forms.Panel pnlGrid;
         private System.Windows.Forms.DataGridView dgvTrades;
         private System.Windows.Forms.BindingSource tradeDtoBindingSource;

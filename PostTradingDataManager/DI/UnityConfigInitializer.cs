@@ -17,7 +17,7 @@ namespace PostTradingDataManager.DI
         {
             var container = new UnityContainer();
 
-            container.RegisterType<ITradesRepository, TradesRepository>(new HierarchicalLifetimeManager());
+            container.RegisterSingleton<ITradesRepository, TradesRepository>();
 
             config.DependencyResolver = new UnityDependencyResolver(container);
         }

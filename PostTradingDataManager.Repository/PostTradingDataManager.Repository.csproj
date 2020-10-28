@@ -46,8 +46,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Interfaces\ITradesRepository.cs" />
-    <Compile Include="Models\FilteredTradesCollectionModel.cs" />
-    <Compile Include="Models\FilteredTradesModel.cs" />
     <Compile Include="Models\TradeModel.cs" />
     <Compile Include="Models\TradesCollectionModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -55,6 +53,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PostTradingDataManager.UI\PostTradingDataManager.UI.csproj">
+      <Project>{814587EB-8BB5-446D-8A18-B48556DE1F96}</Project>
+      <Name>PostTradingDataManager.UI</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

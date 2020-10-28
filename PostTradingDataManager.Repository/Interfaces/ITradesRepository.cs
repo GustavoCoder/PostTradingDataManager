@@ -1,4 +1,5 @@
 ﻿using PostTradingDataManager.Repository.Models;
+using PostTradingDataManager.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,7 @@ namespace PostTradingDataManager.Repository.Interfaces
 {
     public interface ITradesRepository
     {
-
-        IEnumerable<TradeModel> GetTrades();
-
-        IEnumerable<FilteredTradesModel> GetFilteredTrades();
+        Task<IEnumerable<TradeModel>> GetTrades();
+        Task<IEnumerable<TradeModel>> GroupTradesByAll();
     }
 }

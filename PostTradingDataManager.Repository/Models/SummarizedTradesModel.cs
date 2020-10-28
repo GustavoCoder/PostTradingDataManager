@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PostTradingDataManager.Repository.Models
 {
-    public class FilteredTradesModel
+    public class SummarizedTradesModel
     {
         public string Ticker { get; set; }
         public string Side { get; set; }

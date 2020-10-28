@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace PostTradingDataManager.Repository.Models
 {
-    public class FilteredTradesCollectionModel
+    public class SummarizedTradesCollectionModel
     {
-        public IEnumerable<FilteredTradesModel> TradesCollection { get; set; }
+        public List<SummarizedTradesModel> TradesCollection { get; set; }
     }
 }

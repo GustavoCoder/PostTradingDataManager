@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PostTradingDataManager.UI
 {
-    public class TradeDto
+    public class TradesDto
     {
         public long TradeId { get; set; }
         public DateTime TradeDate { get; set; }

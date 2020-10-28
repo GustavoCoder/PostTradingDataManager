@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace PostTradingDataManager.UI
 {
-    public class TradesCollectionDto
+    public enum GroupingType
     {
-        public IEnumerable<TradeDto> TradesCollection { get; set; }
+        All,
+        Ticker,
+        Side,
+        Account
     }
 }

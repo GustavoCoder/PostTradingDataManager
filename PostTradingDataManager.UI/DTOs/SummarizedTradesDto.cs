@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PostTradingDataManager.UI
 {
-    public class FilteredTradesDto
+    public class SummarizedTradesDto
     {
         public string Ticker { get; set; }
         public string Side { get; set; }
