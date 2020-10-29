@@ -11,6 +11,9 @@ namespace PostTradingDataManager.Repository.Interfaces
     public interface ITradesRepository
     {
         Task<IEnumerable<TradeModel>> GetTrades();
-        Task<IEnumerable<TradeModel>> GroupTradesByAll();
+        Task<IEnumerable<TradeModel>> SummarizeByAll();
+        Task<IEnumerable<TradeModel>> SummarizeByTicker();
+        Task<IEnumerable<TradeModel>> SummarizeBySide();
+        Task<IEnumerable<TradeModel>> SummarizeByAccount();
     }
 }

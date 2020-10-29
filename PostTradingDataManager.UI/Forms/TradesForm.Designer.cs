@@ -288,9 +288,11 @@
             // 
             this.tradeDateDataGridViewTextBoxColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
             this.tradeDateDataGridViewTextBoxColumn.DataPropertyName = "TradeDate";
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
             dataGridViewCellStyle1.Format = "d";
             dataGridViewCellStyle1.NullValue = null;
             this.tradeDateDataGridViewTextBoxColumn.DefaultCellStyle = dataGridViewCellStyle1;
+            this.tradeDateDataGridViewTextBoxColumn.FillWeight = 60F;
             this.tradeDateDataGridViewTextBoxColumn.HeaderText = "Date";
             this.tradeDateDataGridViewTextBoxColumn.Name = "tradeDateDataGridViewTextBoxColumn";
             this.tradeDateDataGridViewTextBoxColumn.ReadOnly = true;
@@ -391,6 +393,10 @@
         private System.Windows.Forms.Label lblRowCount;
         private System.Windows.Forms.Button btnGroupSearch;
         private System.Windows.Forms.GroupBox gbGroupBy;
+        private System.Windows.Forms.RadioButton rbGroupByAccount;
+        private System.Windows.Forms.RadioButton rbGroupBySide;
+        private System.Windows.Forms.RadioButton rbGroupByTicker;
+        private System.Windows.Forms.RadioButton rbGroupByAll;
         private System.Windows.Forms.DataGridViewTextBoxColumn tradeIdDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn tradeDateDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn accountDataGridViewTextBoxColumn;
@@ -398,9 +404,5 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn sideDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn quantityDataGridViewTextBoxColumn;
         private System.Windows.Forms.DataGridViewTextBoxColumn priceDataGridViewTextBoxColumn;
-        private System.Windows.Forms.RadioButton rbGroupByAccount;
-        private System.Windows.Forms.RadioButton rbGroupBySide;
-        private System.Windows.Forms.RadioButton rbGroupByTicker;
-        private System.Windows.Forms.RadioButton rbGroupByAll;
     }
 }

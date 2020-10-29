@@ -1,19 +1,17 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Configuration;
-using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.Office.Interop.Excel;
 using OfficeOpenXml;
 using System.Diagnostics;
-using Application = Microsoft.Office.Interop.Excel.Application;
+using System.Globalization;
+using System.Data;
+using ClosedXML;
+using ClosedXML.Excel;
 
 namespace PostTradingDataManager.UI
 {
@@ -22,17 +20,15 @@ namespace PostTradingDataManager.UI
         #region "API Endpoints"
 
         private string tradesEndpoint = ConfigurationManager.AppSettings.Get("getall");
+        private string summarizedEndpoint = ConfigurationManager.AppSettings.Get("summarized");
 
         #endregion
 
         #region "Attributes"
 
         private IEnumerable<TradesDto> _trades;
-        private IEnumerable<TradesDto> _summarizedTrades;
-        private IEnumerable<TradesDto> _summarizedByTicker;
-        private IEnumerable<TradesDto> _summarizedBySide;
-        private IEnumerable<TradesDto> _summarizedByAccount;
-
+        private GroupingType _grouping;
+        DataTable _dataTable = new DataTable();
 
         #endregion
 
@@ -56,9 +52,10 @@ namespace PostTradingDataManager.UI
                     if (response.IsSuccessStatusCode)
                     {
                         var content = await response.Content.ReadAsStringAsync();
-                        _trades = JsonConvert.DeserializeObject<IEnumerable<TradesDto>>(content);
+                        //_trades = JsonConvert.DeserializeObject<IEnumerable<TradesDto>>(content);
+                        _dataTable = (DataTable) JsonConvert.DeserializeObject(content, typeof(DataTable));
 
-                        this.dgvTrades.DataSource = _trades;
+                        this.dgvTrades.DataSource = _dataTable;
                         this.UpdateRowsCount();
                         this.lblRowCount.Visible = true;
                         this.tradeIdDataGridViewTextBoxColumn.Visible = true;
@@ -74,96 +71,123 @@ namespace PostTradingDataManager.UI
                 }
             }
         }
+        private async Task<List<TradesDto>> SummarizeTrades(GroupingType groupingType)
+        {
+            try
+            {
+                switch (groupingType)
+                {
+                    case GroupingType.All:
+                        {
+                            using (var client = new HttpClient())
+                            {
+
+                                using (var response = await client.GetAsync(summarizedEndpoint))
+                                {
+                                    if (response.IsSuccessStatusCode)
+                                    {
+                                        var content = await response.Content.ReadAsStringAsync();
+                                        var trades = JsonConvert.DeserializeObject<IEnumerable<TradesDto>>(content);
+                                        _dataTable = (DataTable) JsonConvert.DeserializeObject(content, typeof(DataTable));
+
+
+                                        this.RefreshGridViewGrouping();
+                                        return trades.ToList();
+
+                                    }
+                                    else
+                                    {
+                                        MessageBox.Show($"Failed to load information: {response.ReasonPhrase} ");
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                    case GroupingType.Ticker:
+                        {
+                            using (var client = new HttpClient())
+                            {
+
+                                using (var response = await client.GetAsync($"{summarizedEndpoint}/ticker"))
+                                {
+                                    if (response.IsSuccessStatusCode)
+                                    {
+                                        var content = await response.Content.ReadAsStringAsync();
+                                        var trades = JsonConvert.DeserializeObject<IEnumerable<TradesDto>>(content);
+
+                                        this.RefreshGridViewTickerGrouping();
+                                        return trades.ToList();
+
+                                    }
+                                    else
+                                    {
+                                        MessageBox.Show($"Failed to load information: {response.ReasonPhrase} ");
+                                    }
+                                }
+                            }
+
+                            break;
+                        }
+                    case GroupingType.Side:
+                        {
+                            using (var client = new HttpClient())
+                            {
+
+                                using (var response = await client.GetAsync($"{summarizedEndpoint}/side"))
+                                {
+                                    if (response.IsSuccessStatusCode)
+                                    {
+                                        var content = await response.Content.ReadAsStringAsync();
+                                        var trades = JsonConvert.DeserializeObject<IEnumerable<TradesDto>>(content);
+
+                                        this.RefreshGridViewSideGrouping();
+                                        return trades.ToList();
+
+                                    }
+                                    else
+                                    {
+                                        MessageBox.Show($"Failed to load information: {response.ReasonPhrase} ");
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                    case GroupingType.Account:
+                        {
+                            using (var client = new HttpClient())
+                            {
+
+                                using (var response = await client.GetAsync($"{summarizedEndpoint}/account"))
+                                {
+                                    if (response.IsSuccessStatusCode)
+                                    {
+                                        var content = await response.Content.ReadAsStringAsync();
+                                        var trades = JsonConvert.DeserializeObject<IEnumerable<TradesDto>>(content);
+
+                                        this.RefreshGridViewAccountGrouping();
+                                        return trades.ToList();
+
+                                    }
+                                    else
+                                    {
+                                        MessageBox.Show($"Failed to load information: {response.ReasonPhrase} ");
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                    default: throw new ArgumentOutOfRangeException();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+
+            return null;
+        }
 
         #endregion
-
-        private async Task<List<TradesDto>> SummarizeTrades(IEnumerable<TradesDto> trades)
-        {
-
-            if (rbGroupByAll.Checked)
-            {
-                if (_summarizedTrades == null)
-                {
-                    _summarizedTrades = await Task.Run(() => from item in trades
-                                                             group item by new { item.Ticker, item.Side, item.Account } into g
-                                                             orderby g.Key.Account, g.Key.Ticker, g.Key.Side
-                                                             select new TradesDto
-                                                             {
-                                                                 Ticker = g.Key.Ticker,
-                                                                 Side = g.Key.Side,
-                                                                 Account = g.Key.Account,
-                                                                 Quantity = g.Sum(x => x.Quantity),
-                                                                 Price = g.Sum(y => (y.Quantity * y.Price) / g.Sum(z => z.Quantity))
-                                                             });
-                }
-
-                this.RefreshGridViewGrouping();
-                return _summarizedTrades.ToList();
-
-
-            }
-            else if (rbGroupByTicker.Checked)
-            {
-
-                if (_summarizedByTicker == null)
-                {
-                    _summarizedByTicker = await Task.Run(() => from item in trades
-                                                               group item by new { item.Ticker } into g
-                                                               orderby g.Key.Ticker
-                                                               select new TradesDto
-                                                               {
-                                                                   Ticker = g.Key.Ticker,
-                                                                   Quantity = g.Sum(x => x.Quantity),
-                                                                   Price = g.Sum(y => (y.Quantity * y.Price) / g.Sum(z => z.Quantity))
-                                                               });
-                }
-
-                this.RefreshGridViewTickerGrouping();
-                return _summarizedByTicker.ToList();
-
-            }
-            else if (rbGroupBySide.Checked)
-            {
-
-                if (_summarizedBySide == null)
-                {
-                    _summarizedBySide = await Task.Run(() => from trade in trades
-                                                             group trade by new { trade.Side } into g
-                                                             orderby g.Key.Side
-                                                             select new TradesDto
-                                                             {
-                                                                 Side = g.Key.Side,
-                                                                 Quantity = g.Sum(x => x.Quantity),
-                                                                 Price = g.Sum(y => (y.Quantity * y.Price) / g.Sum(z => z.Quantity))
-                                                             });
-                }
-
-
-                this.RefreshGridViewSideGrouping();
-                return _summarizedBySide.ToList();
-
-            }
-            else
-            {
-                if (_summarizedByAccount == null)
-                {
-                    _summarizedByAccount = await Task.Run(() => from trade in trades
-                                                                group trade by new { trade.Account } into g
-                                                                orderby g.Key.Account
-                                                                select new TradesDto
-                                                                {
-                                                                    Account = g.Key.Account,
-                                                                    Quantity = g.Sum(x => x.Quantity),
-                                                                    Price = g.Sum(y => (y.Quantity * y.Price) / g.Sum(z => z.Quantity))
-                                                                });
-                }
-
-
-                this.RefreshGridViewAccountGrouping();
-                return _summarizedByAccount.ToList();
-
-            }
-        }
 
         #region "Events"
         private async void btnSearch_Click(object sender, EventArgs e)
@@ -184,7 +208,13 @@ namespace PostTradingDataManager.UI
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            var result = await SummarizeTrades(_trades);
+            //if(_trades == null)
+            //{
+            //    MessageBox.Show("There are no trades to group. Please, load trades first.");
+            //    return;
+            //}
+
+            var result = await SummarizeTrades(_grouping);
             this.RefreshDataSource(result.ToList());
             this.UpdateRowsCount();
             stopwatch.Stop();
@@ -195,60 +225,47 @@ namespace PostTradingDataManager.UI
         private void rbGroupByAll_CheckedChanged(object sender, EventArgs e)
         {
             btnGroupSearch.Enabled = true;
+            _grouping = GroupingType.All;
         }
 
         private void rbGroupByTicker_CheckedChanged(object sender, EventArgs e)
         {
             btnGroupSearch.Enabled = true;
+            _grouping = GroupingType.Ticker;
         }
 
         private void rbSide_CheckedChanged(object sender, EventArgs e)
         {
             btnGroupSearch.Enabled = true;
+            _grouping = GroupingType.Side;
         }
 
         private void rbAccount_CheckedChanged(object sender, EventArgs e)
         {
             btnGroupSearch.Enabled = true;
+            _grouping = GroupingType.Account;
         }
 
         private void btnExportExcel_Click(object sender, EventArgs e)
         {
-            if (dgvTrades.Rows.Count > 0)
+            var path = SaveAsExcel();
+
+            if (!string.IsNullOrEmpty(path))
             {
-                try
+                using (var wb = new XLWorkbook())
                 {
-                    Application xcelApp = new Application();
-                    xcelApp.Application.Workbooks.Add(Type.Missing);
-
-                    for (int i = 1; i < dgvTrades.Columns.Count + 1; i++)
-                    {
-                        xcelApp.Cells[1, i] = dgvTrades.Columns[i - 1].HeaderText;
-                    }
-
-                    for (int i = 0; i < dgvTrades.Rows.Count; i++)
-                    {
-                        for(int j = 0; j < dgvTrades.Columns.Count; j++)
-                        {
-                            xcelApp.Cells[i + 2, j + 1] = dgvTrades.Rows[i].Cells[j].Value;
-                        }
-                    }
-
-                    xcelApp.Columns.AutoFit();
-                    xcelApp.Visible = true;
-
-                } catch (Exception ex)
-                {
-                    throw new Exception(ex.Message);
+                    wb.Worksheets.Add(this._dataTable, "Trades");
+                    wb.SaveAs(path);
                 }
+                MessageBox.Show("You have successfully exported your data to an excel file.", "Message", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-
-            //GetDestinationFile();
         }
 
         private void btnExportCsv_Click(object sender, EventArgs e)
         {
+            var path = SaveAsCsv();
 
+            
         }
 
         private void btnExportPdf_Click(object sender, EventArgs e)
@@ -259,6 +276,7 @@ namespace PostTradingDataManager.UI
         #endregion
 
         #region "Utility Methods"
+
         private void UpdateRowsCount()
         {
             this.lblRowCount.Text = $"Rows: {this.dgvTrades.Rows.Count}";
@@ -307,37 +325,45 @@ namespace PostTradingDataManager.UI
             this.tradeDateDataGridViewTextBoxColumn.Visible = false;
             this.priceDataGridViewTextBoxColumn.HeaderText = "Average Price";
         }
-        private string GetDestinationFile()
+        private string SaveAsCsv()
         {
-            using (var path = new SaveFileDialog())
+            using (var saveFile = new SaveFileDialog())
             {
-                path.Title = "Exporting to excel...";
-                path.Filter = "Excel files (*.xlsx)|*.xlsx";
-                path.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                path.CreatePrompt = false;
+                saveFile.Title = "Exporting as .csv file.";
+                saveFile.Filter = "Excel files (*.csv)|*.csv";
+                saveFile.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                saveFile.CreatePrompt = false;
 
-                var result = path.ShowDialog();
+                var result = saveFile.ShowDialog();
 
                 if (result == DialogResult.Cancel)
                 {
                     return null;
                 }
 
-                return path.FileName;
+                return saveFile.FileName;
             }
         }
-
-        private void CopyDataToClipboard()
+        private string SaveAsExcel()
         {
-            dgvTrades.SelectAll();
-            DataObject data = dgvTrades.GetClipboardContent();
-            if(data != null)
+            using (var saveFile = new SaveFileDialog())
             {
-                Clipboard.SetDataObject(data);
+                saveFile.Title = "Exporting to excel.";
+                saveFile.Filter = "Excel files (*.xlsx)|*.xlsx";
+                saveFile.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                saveFile.CreatePrompt = false;
+
+                var result = saveFile.ShowDialog();
+
+                if(result == DialogResult.Cancel)
+                {
+                    return null;
+                }
+
+                return saveFile.FileName;
             }
         }
         #endregion
-
 
     }
 }

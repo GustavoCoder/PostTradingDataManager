@@ -14,6 +14,7 @@ namespace PostTradingDataManager.Repository
 {
     public sealed class TradesRepository : ITradesRepository
     {
+        private IEnumerable<TradeModel> _loadedTrades;
 
         public async Task<IEnumerable<TradeModel>> GetTrades()
         {
@@ -25,7 +26,9 @@ namespace PostTradingDataManager.Repository
                 {
                     var trades = await sr.ReadToEndAsync();
 
-                    return JsonConvert.DeserializeObject<TradesCollectionModel>(trades).TradesCollection;
+                    _loadedTrades = JsonConvert.DeserializeObject<TradesCollectionModel>(trades).TradesCollection;
+
+                    return _loadedTrades;
                 }
             }
             catch (Exception ex)
@@ -34,19 +37,12 @@ namespace PostTradingDataManager.Repository
             }
         }
 
-        public async Task<IEnumerable<TradeModel>> GroupTradesByAll()
+        public async Task<IEnumerable<TradeModel>> SummarizeByAll()
         {
-            var path = ConfigurationManager.AppSettings.Get("testData");
 
             try
             {
-                using (var sr = new StreamReader(path))
-                {
-                    var content = await sr.ReadToEndAsync();
-
-                    var tradesList = JsonConvert.DeserializeObject<TradesCollectionModel>(content).TradesCollection;
-
-                    var result = await Task.Run(() => from item in tradesList
+                    var result = await Task.Run(() => from item in _loadedTrades
                                                       group item by new { item.Ticker, item.Side, item.Account } into g
                                          orderby g.Key.Account, g.Key.Ticker, g.Key.Side
                                          select new TradeModel
@@ -58,14 +54,80 @@ namespace PostTradingDataManager.Repository
                                              Price = g.Sum(y => (y.Quantity * y.Price) / g.Sum(z => z.Quantity))
                                          });
 
-                    return result.ToList();
-                }
+                    return result;
+                
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }
+        }
 
+        public async Task<IEnumerable<TradeModel>> SummarizeByTicker()
+        {
+            try
+            {
+                var result = await Task.Run(() => from item in _loadedTrades
+                                                  group item by new { item.Ticker } into g
+                                     orderby g.Key.Ticker
+                                     select new TradeModel
+                                     {
+                                         Ticker = g.Key.Ticker,
+                                         Quantity = g.Sum(x => x.Quantity),
+                                         Price = Math.Round(g.Sum(y => (y.Quantity * y.Price) / g.Sum(z => z.Quantity)), 4)
+                                     });
+
+                return result;
+            } 
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<IEnumerable<TradeModel>> SummarizeBySide()
+        {
+            try
+            {
+                var result = await Task.Run(() => from trade in _loadedTrades
+                                                  group trade by new { trade.Side } into g
+                                     orderby g.Key.Side
+                                     select new TradeModel
+                                     {
+                                         Side = g.Key.Side,
+                                         Quantity = g.Sum(x => x.Quantity),
+                                         Price = Math.Round(g.Sum(y => (y.Quantity * y.Price) / g.Sum(z => z.Quantity)), 4)
+                                     });
+
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<IEnumerable<TradeModel>> SummarizeByAccount()
+        {
+            try
+            {
+                var result = await Task.Run(() => from trade in _loadedTrades
+                                                  group trade by new { trade.Account } into g
+                                     orderby g.Key.Account
+                                     select new TradeModel
+                                     {
+                                         Account = g.Key.Account,
+                                         Quantity = g.Sum(x => x.Quantity),
+                                         Price = Math.Round(g.Sum(y => (y.Quantity * y.Price) / g.Sum(z => z.Quantity)), 4)
+                                     });
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }
