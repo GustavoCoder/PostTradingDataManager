@@ -1,8 +1,14 @@
 
 1. Update all Nuget packages.
-2. Get the file test_data.json located in the PostingTradingDataManager.Repository and place it in the c:\test\ folder. 
+
+
+2. Get the file test_data.json located in the PostingTradingDataManager.Repository and place it in the c:\test\ folder of your computer. 
 If you want to save it somewhere else, please change Web.config. Eg. <add key="testData" value="yourfolder\test_data.json" />
+
+
 3. Set startup projects: PostTradingDataManager and PostTradingDataManager.UI.
+
+
 4. Testing market data was generated from json-generator.com by the following script
 
 {
