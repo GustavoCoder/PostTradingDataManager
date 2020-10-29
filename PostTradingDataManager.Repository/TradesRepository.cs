@@ -37,7 +37,7 @@ namespace PostTradingDataManager.Repository
             }
         }
 
-        public async Task<IEnumerable<TradeModel>> SummarizeByAll()
+        public async Task<IEnumerable<GroupingModel>> SummarizeByAll()
         {
 
             try
@@ -45,13 +45,13 @@ namespace PostTradingDataManager.Repository
                     var result = await Task.Run(() => from item in _loadedTrades
                                                       group item by new { item.Ticker, item.Side, item.Account } into g
                                          orderby g.Key.Account, g.Key.Ticker, g.Key.Side
-                                         select new TradeModel
+                                         select new GroupingModel
                                          {
                                              Ticker = g.Key.Ticker,
                                              Side = g.Key.Side,
                                              Account = g.Key.Account,
                                              Quantity = g.Sum(x => x.Quantity),
-                                             Price = g.Sum(y => (y.Quantity * y.Price) / g.Sum(z => z.Quantity))
+                                             Price = Math.Round(g.Sum(y => (y.Quantity * y.Price) / g.Sum(z => z.Quantity)), 4)
                                          });
 
                     return result;
@@ -63,14 +63,14 @@ namespace PostTradingDataManager.Repository
             }
         }
 
-        public async Task<IEnumerable<TradeModel>> SummarizeByTicker()
+        public async Task<IEnumerable<TickerGroupingModel>> SummarizeByTicker()
         {
             try
             {
                 var result = await Task.Run(() => from item in _loadedTrades
                                                   group item by new { item.Ticker } into g
                                      orderby g.Key.Ticker
-                                     select new TradeModel
+                                     select new TickerGroupingModel
                                      {
                                          Ticker = g.Key.Ticker,
                                          Quantity = g.Sum(x => x.Quantity),
@@ -85,14 +85,14 @@ namespace PostTradingDataManager.Repository
             }
         }
 
-        public async Task<IEnumerable<TradeModel>> SummarizeBySide()
+        public async Task<IEnumerable<SideGroupingModel>> SummarizeBySide()
         {
             try
             {
                 var result = await Task.Run(() => from trade in _loadedTrades
                                                   group trade by new { trade.Side } into g
                                      orderby g.Key.Side
-                                     select new TradeModel
+                                     select new SideGroupingModel
                                      {
                                          Side = g.Key.Side,
                                          Quantity = g.Sum(x => x.Quantity),
@@ -108,14 +108,14 @@ namespace PostTradingDataManager.Repository
             }
         }
 
-        public async Task<IEnumerable<TradeModel>> SummarizeByAccount()
+        public async Task<IEnumerable<AccountGroupingModel>> SummarizeByAccount()
         {
             try
             {
                 var result = await Task.Run(() => from trade in _loadedTrades
                                                   group trade by new { trade.Account } into g
                                      orderby g.Key.Account
-                                     select new TradeModel
+                                     select new AccountGroupingModel
                                      {
                                          Account = g.Key.Account,
                                          Quantity = g.Sum(x => x.Quantity),

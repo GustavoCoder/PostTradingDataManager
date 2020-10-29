@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PostTradingDataManager.Repository.Models
 {
-    public class TradesCollectionModel
+    public sealed class TradesCollectionModel
     {
         public IEnumerable<TradeModel> TradesCollection { get; set; }
     }

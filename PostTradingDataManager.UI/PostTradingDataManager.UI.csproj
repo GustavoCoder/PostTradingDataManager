@@ -75,6 +75,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\ApiHelper.cs" />
+    <Compile Include="API\IApiHelper.cs" />
+    <Compile Include="Helpers\ExportHelper.cs" />
     <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

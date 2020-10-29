@@ -46,6 +46,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Interfaces\ITradesRepository.cs" />
+    <Compile Include="Models\AccountGroupingModel.cs" />
+    <Compile Include="Models\GroupingModel.cs" />
+    <Compile Include="Models\SideGroupingModel.cs" />
+    <Compile Include="Models\TickerGroupingModel.cs" />
     <Compile Include="Models\TradeModel.cs" />
     <Compile Include="Models\TradesCollectionModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

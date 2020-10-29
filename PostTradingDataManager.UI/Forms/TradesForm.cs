@@ -17,16 +17,14 @@ namespace PostTradingDataManager.UI
 {
     public partial class TradesForm : Form
     {
-        #region "API Endpoints"
+        #region "API Endpoint"
 
         private string tradesEndpoint = ConfigurationManager.AppSettings.Get("getall");
-        private string summarizedEndpoint = ConfigurationManager.AppSettings.Get("summarized");
 
         #endregion
 
-        #region "Attributes"
+        #region "Global Variables"
 
-        private IEnumerable<TradesDto> _trades;
         private GroupingType _grouping;
         DataTable _dataTable = new DataTable();
 
@@ -46,14 +44,12 @@ namespace PostTradingDataManager.UI
         {
             using (var client = new HttpClient())
             {
-
                 using (var response = await client.GetAsync(tradesEndpoint))
                 {
                     if (response.IsSuccessStatusCode)
                     {
                         var content = await response.Content.ReadAsStringAsync();
-                        //_trades = JsonConvert.DeserializeObject<IEnumerable<TradesDto>>(content);
-                        _dataTable = (DataTable) JsonConvert.DeserializeObject(content, typeof(DataTable));
+                        _dataTable = (DataTable)JsonConvert.DeserializeObject(content, typeof(DataTable));
 
                         this.dgvTrades.DataSource = _dataTable;
                         this.UpdateRowsCount();
@@ -71,7 +67,7 @@ namespace PostTradingDataManager.UI
                 }
             }
         }
-        private async Task<List<TradesDto>> SummarizeTrades(GroupingType groupingType)
+        private async Task<DataTable> SummarizeTrades(GroupingType groupingType)
         {
             try
             {
@@ -82,17 +78,16 @@ namespace PostTradingDataManager.UI
                             using (var client = new HttpClient())
                             {
 
-                                using (var response = await client.GetAsync(summarizedEndpoint))
+                                using (var response = await client.GetAsync($"{tradesEndpoint}/summarized"))
                                 {
                                     if (response.IsSuccessStatusCode)
                                     {
                                         var content = await response.Content.ReadAsStringAsync();
-                                        var trades = JsonConvert.DeserializeObject<IEnumerable<TradesDto>>(content);
                                         _dataTable = (DataTable) JsonConvert.DeserializeObject(content, typeof(DataTable));
 
 
                                         this.RefreshGridViewGrouping();
-                                        return trades.ToList();
+                                        return _dataTable;
 
                                     }
                                     else
@@ -108,15 +103,15 @@ namespace PostTradingDataManager.UI
                             using (var client = new HttpClient())
                             {
 
-                                using (var response = await client.GetAsync($"{summarizedEndpoint}/ticker"))
+                                using (var response = await client.GetAsync($"{tradesEndpoint}/summarized/ticker"))
                                 {
                                     if (response.IsSuccessStatusCode)
                                     {
                                         var content = await response.Content.ReadAsStringAsync();
-                                        var trades = JsonConvert.DeserializeObject<IEnumerable<TradesDto>>(content);
+                                        _dataTable = (DataTable)JsonConvert.DeserializeObject(content, typeof(DataTable));
 
                                         this.RefreshGridViewTickerGrouping();
-                                        return trades.ToList();
+                                        return _dataTable;
 
                                     }
                                     else
@@ -133,15 +128,15 @@ namespace PostTradingDataManager.UI
                             using (var client = new HttpClient())
                             {
 
-                                using (var response = await client.GetAsync($"{summarizedEndpoint}/side"))
+                                using (var response = await client.GetAsync($"{tradesEndpoint}/summarized/side"))
                                 {
                                     if (response.IsSuccessStatusCode)
                                     {
                                         var content = await response.Content.ReadAsStringAsync();
-                                        var trades = JsonConvert.DeserializeObject<IEnumerable<TradesDto>>(content);
+                                        _dataTable = (DataTable)JsonConvert.DeserializeObject(content, typeof(DataTable));
 
                                         this.RefreshGridViewSideGrouping();
-                                        return trades.ToList();
+                                        return _dataTable;
 
                                     }
                                     else
@@ -157,15 +152,15 @@ namespace PostTradingDataManager.UI
                             using (var client = new HttpClient())
                             {
 
-                                using (var response = await client.GetAsync($"{summarizedEndpoint}/account"))
+                                using (var response = await client.GetAsync($"{tradesEndpoint}/summarized/account"))
                                 {
                                     if (response.IsSuccessStatusCode)
                                     {
                                         var content = await response.Content.ReadAsStringAsync();
-                                        var trades = JsonConvert.DeserializeObject<IEnumerable<TradesDto>>(content);
+                                        _dataTable = (DataTable)JsonConvert.DeserializeObject(content, typeof(DataTable));
 
                                         this.RefreshGridViewAccountGrouping();
-                                        return trades.ToList();
+                                        return _dataTable;
 
                                     }
                                     else
@@ -197,8 +192,8 @@ namespace PostTradingDataManager.UI
             await this.LoadTrades();
             stopwatch.Stop();
 
-            var timeElapsed = stopwatch.ElapsedMilliseconds;
-            MessageBox.Show($"Time elapsed: {timeElapsed}");
+            var timeElapsed = (stopwatch.ElapsedMilliseconds) / 1000.0M;
+            MessageBox.Show($"Time elapsed: {timeElapsed} seconds.");
             
 
         }
@@ -208,18 +203,18 @@ namespace PostTradingDataManager.UI
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            //if(_trades == null)
-            //{
-            //    MessageBox.Show("There are no trades to group. Please, load trades first.");
-            //    return;
-            //}
+            if(_dataTable == null)
+            {
+                MessageBox.Show("There are no trades to group. Please, load trades first.");
+                return;
+            }
 
             var result = await SummarizeTrades(_grouping);
-            this.RefreshDataSource(result.ToList());
+            this.RefreshDataSource(_dataTable);
             this.UpdateRowsCount();
             stopwatch.Stop();
-            var timeElapsed = stopwatch.ElapsedMilliseconds;
-            MessageBox.Show($"Time elapsed: {timeElapsed}");
+            var timeElapsed = (stopwatch.ElapsedMilliseconds)/1000.0M;
+            MessageBox.Show($"Time elapsed: {timeElapsed} seconds.");
         }
 
         private void rbGroupByAll_CheckedChanged(object sender, EventArgs e)
@@ -248,13 +243,13 @@ namespace PostTradingDataManager.UI
 
         private void btnExportExcel_Click(object sender, EventArgs e)
         {
-            var path = SaveAsExcel();
+            var path = Helpers.ExportHelper.SaveAsExcel();
 
             if (!string.IsNullOrEmpty(path))
             {
                 using (var wb = new XLWorkbook())
                 {
-                    wb.Worksheets.Add(this._dataTable, "Trades");
+                    wb.Worksheets.Add(_dataTable, "Trades");
                     wb.SaveAs(path);
                 }
                 MessageBox.Show("You have successfully exported your data to an excel file.", "Message", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -264,7 +259,6 @@ namespace PostTradingDataManager.UI
         private void btnExportCsv_Click(object sender, EventArgs e)
         {
             var path = SaveAsCsv();
-
             
         }
 
@@ -282,9 +276,9 @@ namespace PostTradingDataManager.UI
             this.lblRowCount.Text = $"Rows: {this.dgvTrades.Rows.Count}";
         }
 
-        private void RefreshDataSource(List<TradesDto> filteredTrades)
+        private void RefreshDataSource(DataTable summarizedTrades)
         {
-            this.dgvTrades.DataSource = filteredTrades;
+            this.dgvTrades.DataSource = summarizedTrades;
         }
 
         private void RefreshGridViewGrouping()
@@ -324,44 +318,6 @@ namespace PostTradingDataManager.UI
             this.tradeIdDataGridViewTextBoxColumn.Visible = false;
             this.tradeDateDataGridViewTextBoxColumn.Visible = false;
             this.priceDataGridViewTextBoxColumn.HeaderText = "Average Price";
-        }
-        private string SaveAsCsv()
-        {
-            using (var saveFile = new SaveFileDialog())
-            {
-                saveFile.Title = "Exporting as .csv file.";
-                saveFile.Filter = "Excel files (*.csv)|*.csv";
-                saveFile.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                saveFile.CreatePrompt = false;
-
-                var result = saveFile.ShowDialog();
-
-                if (result == DialogResult.Cancel)
-                {
-                    return null;
-                }
-
-                return saveFile.FileName;
-            }
-        }
-        private string SaveAsExcel()
-        {
-            using (var saveFile = new SaveFileDialog())
-            {
-                saveFile.Title = "Exporting to excel.";
-                saveFile.Filter = "Excel files (*.xlsx)|*.xlsx";
-                saveFile.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                saveFile.CreatePrompt = false;
-
-                var result = saveFile.ShowDialog();
-
-                if(result == DialogResult.Cancel)
-                {
-                    return null;
-                }
-
-                return saveFile.FileName;
-            }
         }
         #endregion
 
