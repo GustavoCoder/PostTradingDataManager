@@ -270,7 +270,7 @@ namespace PostTradingDataManager.UI
                 foreach (DataRow row in _dataTable.Rows)
                     {
                         string[] data = row.ItemArray
-                                            .Select(field => field.ToString())
+                                            .Select(item => item.ToString())
                                             .ToArray();
 
                         sb.AppendLine(string.Join(",", data));
@@ -279,7 +279,7 @@ namespace PostTradingDataManager.UI
                 File.WriteAllText(path, sb.ToString());
                 sw.Stop();
                 var timeElapsed = (sw.ElapsedMilliseconds) / 1000.0M;
-                MessageBox.Show($"Data exported to .csv file. Time elapsed:{timeElapsed} seconds.", "Success!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Data exported to .csv file. Time elapsed: {timeElapsed} seconds.", "Success!", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 

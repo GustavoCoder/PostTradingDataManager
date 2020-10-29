@@ -27,7 +27,7 @@ namespace PostTradingDataManager.Controllers
 
         [Route("getAll")]
         [HttpGet]
-        [CacheOutput(ServerTimeSpan = 120)]
+        [CacheOutput(ServerTimeSpan = 600)]
         public async Task<IHttpActionResult> GetAllTrades()
         {
             try
@@ -44,7 +44,7 @@ namespace PostTradingDataManager.Controllers
 
         [Route("getAll/summarized")]
         [HttpGet]
-        [CacheOutput(ServerTimeSpan = 120)]
+        [CacheOutput(ServerTimeSpan = 600)]
         public async Task<IHttpActionResult> SummarizeTradesByAll()
         {
             try
@@ -60,7 +60,7 @@ namespace PostTradingDataManager.Controllers
 
         [Route("getAll/summarized/ticker")]
         [HttpGet]
-        [CacheOutput(ServerTimeSpan = 120)]
+        [CacheOutput(ServerTimeSpan = 600)]
         public async Task<IHttpActionResult> SummarizeTradesByTicker()
         {
             try
@@ -76,7 +76,7 @@ namespace PostTradingDataManager.Controllers
 
         [Route("getAll/summarized/side")]
         [HttpGet]
-        [CacheOutput(ServerTimeSpan = 120)]
+        [CacheOutput(ServerTimeSpan = 600)]
         public async Task<IHttpActionResult> SummarizeTradesBySide()
         {
             try
@@ -92,7 +92,7 @@ namespace PostTradingDataManager.Controllers
 
         [Route("getAll/summarized/account")]
         [HttpGet]
-        [CacheOutput(ServerTimeSpan = 120)]
+        [CacheOutput(ServerTimeSpan = 600)]
         public async Task<IHttpActionResult> SummarizeTradesByAccount()
         {
             try
