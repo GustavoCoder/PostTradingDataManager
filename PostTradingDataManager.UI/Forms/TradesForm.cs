@@ -258,7 +258,6 @@ namespace PostTradingDataManager.UI
 
         private void btnExportCsv_Click(object sender, EventArgs e)
         {
-            var path = SaveAsCsv();
             
         }
 
