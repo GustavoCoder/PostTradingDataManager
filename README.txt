@@ -3,7 +3,7 @@
 
 
 2. Get the file test_data.json located in the PostingTradingDataManager.Repository and place it in the c:\test\ folder of your computer. 
-If you want to save it somewhere else, please change Web.config. Eg. <add key="testData" value="yourfolder\test_data.json" />
+If you want to save it somewhere else, please edit Web.config. Eg. <add key="testData" value="yourfolder\test_data.json" />
 
 
 3. Set startup projects: PostTradingDataManager and PostTradingDataManager.UI.
