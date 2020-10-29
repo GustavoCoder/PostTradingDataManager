@@ -58,6 +58,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="test_data.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PostTradingDataManager.UI\PostTradingDataManager.UI.csproj">
