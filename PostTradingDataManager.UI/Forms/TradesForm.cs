@@ -6,12 +6,13 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using OfficeOpenXml;
 using System.Diagnostics;
 using System.Globalization;
 using System.Data;
 using ClosedXML;
 using ClosedXML.Excel;
+using System.IO;
+using System.Text;
 
 namespace PostTradingDataManager.UI
 {
@@ -67,7 +68,7 @@ namespace PostTradingDataManager.UI
                 }
             }
         }
-        private async Task<DataTable> SummarizeTrades(GroupingType groupingType)
+        private async Task SummarizeTrades(GroupingType groupingType)
         {
             try
             {
@@ -87,7 +88,6 @@ namespace PostTradingDataManager.UI
 
 
                                         this.RefreshGridViewGrouping();
-                                        return _dataTable;
 
                                     }
                                     else
@@ -111,7 +111,6 @@ namespace PostTradingDataManager.UI
                                         _dataTable = (DataTable)JsonConvert.DeserializeObject(content, typeof(DataTable));
 
                                         this.RefreshGridViewTickerGrouping();
-                                        return _dataTable;
 
                                     }
                                     else
@@ -136,7 +135,6 @@ namespace PostTradingDataManager.UI
                                         _dataTable = (DataTable)JsonConvert.DeserializeObject(content, typeof(DataTable));
 
                                         this.RefreshGridViewSideGrouping();
-                                        return _dataTable;
 
                                     }
                                     else
@@ -160,7 +158,6 @@ namespace PostTradingDataManager.UI
                                         _dataTable = (DataTable)JsonConvert.DeserializeObject(content, typeof(DataTable));
 
                                         this.RefreshGridViewAccountGrouping();
-                                        return _dataTable;
 
                                     }
                                     else
@@ -178,13 +175,11 @@ namespace PostTradingDataManager.UI
             {
                 throw new Exception(ex.Message);
             }
-
-            return null;
         }
 
         #endregion
 
-        #region "Events"
+        #region "Event Handlers"
         private async void btnSearch_Click(object sender, EventArgs e)
         {
             Stopwatch stopwatch = new Stopwatch();
@@ -193,9 +188,8 @@ namespace PostTradingDataManager.UI
             stopwatch.Stop();
 
             var timeElapsed = (stopwatch.ElapsedMilliseconds) / 1000.0M;
-            MessageBox.Show($"Time elapsed: {timeElapsed} seconds.");
+            MessageBox.Show($"Loaded successfully. Time elapsed: {timeElapsed} seconds.");
             
-
         }
 
         private async void btnGroupTrades_Click(object sender, EventArgs e)
@@ -203,18 +197,20 @@ namespace PostTradingDataManager.UI
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            if(_dataTable == null)
+            if (_dataTable.Rows.Count == 0)
             {
-                MessageBox.Show("There are no trades to group. Please, load trades first.");
-                return;
+                MessageBox.Show("No trades to group. Please, load trades first.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            } 
+            else
+            {
+                await SummarizeTrades(_grouping);
+                this.RefreshDataSource(_dataTable);
+                this.UpdateRowsCount();
+                stopwatch.Stop();
+                var timeElapsed = (stopwatch.ElapsedMilliseconds) / 1000.0M;
+                MessageBox.Show($"Grouping was complete. Time elapsed: {timeElapsed} seconds.");
             }
 
-            var result = await SummarizeTrades(_grouping);
-            this.RefreshDataSource(_dataTable);
-            this.UpdateRowsCount();
-            stopwatch.Stop();
-            var timeElapsed = (stopwatch.ElapsedMilliseconds)/1000.0M;
-            MessageBox.Show($"Time elapsed: {timeElapsed} seconds.");
         }
 
         private void rbGroupByAll_CheckedChanged(object sender, EventArgs e)
@@ -247,23 +243,44 @@ namespace PostTradingDataManager.UI
 
             if (!string.IsNullOrEmpty(path))
             {
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
                 using (var wb = new XLWorkbook())
                 {
                     wb.Worksheets.Add(_dataTable, "Trades");
                     wb.SaveAs(path);
                 }
-                MessageBox.Show("You have successfully exported your data to an excel file.", "Message", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                sw.Stop();
+                var timeElapsed = (sw.ElapsedMilliseconds) / 1000.0M;
+                MessageBox.Show($"Data exported to excel file. Time elapsed: {timeElapsed} seconds.", "Message", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
         private void btnExportCsv_Click(object sender, EventArgs e)
         {
-            
-        }
 
-        private void btnExportPdf_Click(object sender, EventArgs e)
-        {
+            var path = Helpers.ExportHelper.SaveAsCsv();
 
+            if (!string.IsNullOrEmpty(path))
+            {
+                StringBuilder sb = new StringBuilder();
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+
+                foreach (DataRow row in _dataTable.Rows)
+                    {
+                        string[] data = row.ItemArray
+                                            .Select(field => field.ToString())
+                                            .ToArray();
+
+                        sb.AppendLine(string.Join(",", data));
+                    }
+
+                File.WriteAllText(path, sb.ToString());
+                sw.Stop();
+                var timeElapsed = (sw.ElapsedMilliseconds) / 1000.0M;
+                MessageBox.Show($"Data exported to .csv file. Time elapsed:{timeElapsed} seconds.", "Success!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         #endregion

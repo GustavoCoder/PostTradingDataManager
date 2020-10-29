@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace PostTradingDataManager.Repository
 {
@@ -39,95 +40,113 @@ namespace PostTradingDataManager.Repository
 
         public async Task<IEnumerable<GroupingModel>> SummarizeByAll()
         {
-
-            try
+            if(_loadedTrades != null)
             {
+                try
+                {
                     var result = await Task.Run(() => from item in _loadedTrades
                                                       group item by new { item.Ticker, item.Side, item.Account } into g
-                                         orderby g.Key.Account, g.Key.Ticker, g.Key.Side
-                                         select new GroupingModel
-                                         {
-                                             Ticker = g.Key.Ticker,
-                                             Side = g.Key.Side,
-                                             Account = g.Key.Account,
-                                             Quantity = g.Sum(x => x.Quantity),
-                                             Price = Math.Round(g.Sum(y => (y.Quantity * y.Price) / g.Sum(z => z.Quantity)), 4)
-                                         });
+                                                      orderby g.Key.Account, g.Key.Ticker, g.Key.Side
+                                                      select new GroupingModel
+                                                      {
+                                                          Ticker = g.Key.Ticker,
+                                                          Side = g.Key.Side,
+                                                          Account = g.Key.Account,
+                                                          Quantity = g.Sum(x => x.Quantity),
+                                                          Price = Math.Round(g.Sum(y => (y.Quantity * y.Price) / g.Sum(z => z.Quantity)), 4)
+                                                      });
 
                     return result;
-                
+
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+
+            return null;
         }
 
         public async Task<IEnumerable<TickerGroupingModel>> SummarizeByTicker()
         {
-            try
+            if(_loadedTrades != null)
             {
-                var result = await Task.Run(() => from item in _loadedTrades
-                                                  group item by new { item.Ticker } into g
-                                     orderby g.Key.Ticker
-                                     select new TickerGroupingModel
-                                     {
-                                         Ticker = g.Key.Ticker,
-                                         Quantity = g.Sum(x => x.Quantity),
-                                         Price = Math.Round(g.Sum(y => (y.Quantity * y.Price) / g.Sum(z => z.Quantity)), 4)
-                                     });
+                try
+                {
+                    var result = await Task.Run(() => from item in _loadedTrades
+                                                      group item by new { item.Ticker } into g
+                                                      orderby g.Key.Ticker
+                                                      select new TickerGroupingModel
+                                                      {
+                                                          Ticker = g.Key.Ticker,
+                                                          Quantity = g.Sum(x => x.Quantity),
+                                                          Price = Math.Round(g.Sum(y => (y.Quantity * y.Price) / g.Sum(z => z.Quantity)), 4)
+                                                      });
 
-                return result;
-            } 
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message);
+                }
             }
+            return null;
         }
 
         public async Task<IEnumerable<SideGroupingModel>> SummarizeBySide()
         {
-            try
+            if(_loadedTrades != null)
             {
-                var result = await Task.Run(() => from trade in _loadedTrades
-                                                  group trade by new { trade.Side } into g
-                                     orderby g.Key.Side
-                                     select new SideGroupingModel
-                                     {
-                                         Side = g.Key.Side,
-                                         Quantity = g.Sum(x => x.Quantity),
-                                         Price = Math.Round(g.Sum(y => (y.Quantity * y.Price) / g.Sum(z => z.Quantity)), 4)
-                                     });
+                try
+                {
+                    var result = await Task.Run(() => from trade in _loadedTrades
+                                                      group trade by new { trade.Side } into g
+                                                      orderby g.Key.Side
+                                                      select new SideGroupingModel
+                                                      {
+                                                          Side = g.Key.Side,
+                                                          Quantity = g.Sum(x => x.Quantity),
+                                                          Price = Math.Round(g.Sum(y => (y.Quantity * y.Price) / g.Sum(z => z.Quantity)), 4)
+                                                      });
 
-                return result;
+                    return result;
 
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+
+            return null;
         }
 
         public async Task<IEnumerable<AccountGroupingModel>> SummarizeByAccount()
         {
-            try
+            if(_loadedTrades != null)
             {
-                var result = await Task.Run(() => from trade in _loadedTrades
-                                                  group trade by new { trade.Account } into g
-                                     orderby g.Key.Account
-                                     select new AccountGroupingModel
-                                     {
-                                         Account = g.Key.Account,
-                                         Quantity = g.Sum(x => x.Quantity),
-                                         Price = Math.Round(g.Sum(y => (y.Quantity * y.Price) / g.Sum(z => z.Quantity)), 4)
-                                     });
+                try
+                {
+                    var result = await Task.Run(() => from trade in _loadedTrades
+                                                      group trade by new { trade.Account } into g
+                                                      orderby g.Key.Account
+                                                      select new AccountGroupingModel
+                                                      {
+                                                          Account = g.Key.Account,
+                                                          Quantity = g.Sum(x => x.Quantity),
+                                                          Price = Math.Round(g.Sum(y => (y.Quantity * y.Price) / g.Sum(z => z.Quantity)), 4)
+                                                      });
 
-                return result;
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
+
+            return null;
         }
     }
 }
